@@ -24,7 +24,7 @@ public class FeedService {
         //입력받은 사진이 없으면 ResVo 객체의 result에 2를 담아 리턴
         FeedInsProcDto pDto= FeedInsProcDto.builder().
                 iuser(dto.getIuser())
-                .contents(dto.getContents())
+                .contents(dto.getContents())//
                 .location(dto.getLocation())
                 .pics(dto.getPics())
                 .build();
