@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="practicegreengram.feed.FeedMapper">
+    <!--피드 작성
+    insert시 생성되는 ifeed값을
+    useGeneratedKeys,keyProperty를 이욯해서 얻는다.-->
+    <insert id="insFeed" useGeneratedKeys="true" keyProperty="ifeed">
+        insert into t_feed
+        <set>
+        iuser= #{iuser}
+            <if test="contents!=null and contents!=''">
+                , contents= #{contents}
+            </if>
+            <if test="location!=null and location!=''">
+                , location= #{location}
+            </if>
+        </set>
+    </insert>
+
+    <!--로그인 또는 프로필 사진 클릭 시 나타나는 피드 리스트
+    프로필 사진을 클릭하지 않으면 targetIuser는 0이 되어
+    모든 피드들이 나온다.-->
+    <select id="selFeedAll">
+        select a.ifeed, a.contents, a.location,
+        a.created_at as createdAt, b.iuser as writerIuser,
+        b.nm as writerNm, b.pic as writerPic,
+        if(c.iuser is null, 0, 1) as isFav
+        from t_feed a
+        join t_user b
+        on a.iuser= b.iuser
+        left join t_feed_fav c
+        on a.ifeed= c.ifeed
+        and c.iuser= #{loginedIuser}
+        <if test="targetIuser>0">
+            where a.iuser= #{targetIuser}
+        </if>
+        order by a.ifeed desc
+        limit #{startIdx}, #{rowCount}
+    </select>
+
+    <!--피드 삭제 시 로그인한 유저가 쓴 글이 맞는지 체크-->
+    <select id="selFeed">
+        select ifeed from t_feed
+        where ifeed= #{ifeed} and iuser= #{iuser}
+    </select>
+
+    <!--피드 삭제-->
+    <delete id="delFeed">
+        delete from t_feed
+        where ifeed= #{ifeed}
+    </delete>
+
+    <!--피드 작성 시 t_feed_pics에 insert되는 사진들
+    forEach문을 이용하여 여러 장의 사진을 insert-->
+    <insert id="insFeedPics">
+        insert into t_feed_pics
+        (ifeed, pic) values
+        <foreach collection="pics" item="pic" separator=",">
+            (#{ifeed},#{pic})
+        </foreach>
+    </insert>
+
+    <!--피드 리스트 실행 시 보여지는 해당 피드의 사진들-->
+    <select id="selFeedPics">
+        select ifeed, pic from t_feed_pics
+        where ifeed in
+        (<foreach collection="ifeedList" item="ifeed" separator=",">
+            #{ifeed}
+        </foreach>)
+    </select>
+
+    <!--피드 삭제 시 실행되는 사진 삭제-->
+    <delete id="delPicsByIfeed">
+        delete from t_feed_pics
+        where ifeed= #{ifeed}
+    </delete>
+
+    <!--로그인한 유저가 누르는 좋아요-->
+    <insert id="insFeedFav">
+        insert into t_feed_fav set
+        ifeed= #{ifeed}, iuser= #{iuser}
+    </insert>
+
+    <!--로그인한 유저가 실행하는 좋아요 취소-->
+    <delete id="delFeedFav">
+        delete from t_feed_fav
+        where ifeed=#{ifeed} and iuser=#{iuser}
+    </delete>
+
+    <!--피드 삭제 시 실행되는 좋아요 삭제-->
+    <delete id="delFavByIfeed">
+        delete from t_feed_fav
+        where ifeed= #{ifeed}
+    </delete>
+
+    <!--댓글 작성(작성 시 생기는 pk를 result에 담아 보내기)-->
+    <insert id="insFeedComment" useGeneratedKeys="true" keyProperty="ifeedComment">
+        insert into t_feed_comment set
+        ifeed= #{ifeed}, iuser=#{iuser},
+        comment=#{comment}
+    </insert>
+
+    <!--댓글 보기-->
+    <select id="selCommentAll">
+        select a.ifeed, a.feed_comment as ifeedComment,
+        a.comment, a.created_at as createdAt,
+        b.iuser as writerIuser, b.nm as writerNm,
+        b.pic as writerPic
+        from t_feed_comment a
+        join t_user b on a.iuser= b.iuser
+        <if test="ifeedList!=null">
+            where a.ifeed in
+            <foreach collection="ifeedList" item="ifeed" open="(" close=")" separator=",">
+                #{ifeed}
+            </foreach>
+        </if>
+        <if test="ifeed!=0">
+            where a.ifeed= #{ifeed}
+        </if>
+        order by a.ifeed
+        <if test="startIdx==3">
+            limit #{startIdx}, #{rowCount}
+        </if>
+    </select>
+
+    <!--댓글 삭제-->
+    <delete id="delFeedComment">
+        delete from t_feed_comment
+        where ifeed_comment=#{ifeedComment}
+        and iuser= #{loginedIuser}
+    </delete>
+
+    <!--피드 삭제 시 실행되는 댓글 삭제-->
+    <delete id="delCommentByIfeed">
+        delete from t_feed_comment
+        where ifeed= #{ifeed}
+    </delete>
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="practicegreengram.user.UserMapper">
+    <!--회원가입-->
+    <!--useGeneratedKeys,keyProperty를 이용하여 iuser값을 procDto에 넣는다.-->
+    <insert id="insUser" useGeneratedKeys="true" keyProperty="iuser">
+        insert into t_user set
+        uid= #{uid}, upw= #{upw} ,nm= #{nm}
+        <if test="pic!=null and pic!=''">
+            ,pic= #{pic}
+        </if>
+        <!--사진은 null 허용이니까 조건문으로 체크, 나머지는 NOT NULL-->
+    </insert>
+    <!--로그인-->
+    <!--dto로 입력받은 아이디가 있는지 없는지 -->
+    <!--있으면 그 아이디의 정보를 리턴타입인 procVo에 넣는다.-->
+    <select id="selUserByUid">
+        select iuser, upw, nm, pic
+        from t_user
+        where uid= #{uid}
+    </select>
+
+    <!--프로필 클릭 시 나타나는 유저 정보-->
+    <!--리턴타입인 vo에 select 결과가 각 이름의 필드에 담긴다.-->
+    <select id="selUserInfo">
+        select a.nm, a.pic,
+        a.created_at as createdAt,
+        count(distinct b.ifeed) as feedCnt,
+        count(c.iuser) as favCnt
+        from t_user a
+        left join t_feed b
+        on a.iuser= b.iuser
+        left join t_feed_fav c
+        on b.ifeed= c.ifeed
+        where a.iuser= #{targetIuser}
+    </select>
+    <!--프로필 사진 변경-->
+    <update id="updUserPic">
+        update t_user set
+        pic= #{pic}
+        where iuser= #{iuser}
+    </update>
+</mapper>
