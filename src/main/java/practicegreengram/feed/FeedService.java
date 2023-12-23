@@ -15,7 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FeedService {
     private final FeedMapper mapper;
-
+//
     //피드 작성
     public ResVo postFeed(FeedInsDto dto){
         if(dto.getPics().size()==0){
