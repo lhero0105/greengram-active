@@ -24,7 +24,7 @@ public class FeedService {
         //입력받은 사진이 없으면 ResVo 객체의 result에 2를 담아 리턴
         FeedInsProcDto pDto= FeedInsProcDto.builder().
                 iuser(dto.getIuser())
-                .contents(dto.getContents())//
+                .contents(dto.getContents())
                 .location(dto.getLocation())
                 .pics(dto.getPics())
                 .build();
@@ -83,8 +83,8 @@ public class FeedService {
                 List<FeedCommentSelVo> feedComments = feedCommentMap.get(vo.getIfeed());
                 if (feedComments != null) {
                     vo.setComments(feedComments);
-                    while(vo.getComments().size()>4){
-                        vo.getComments().remove(vo.getComments().size()-1);
+                    while(vo.getComments().size() > 4){
+                        vo.getComments().remove(vo.getComments().size() - 1);
                     }
                     if (vo.getComments().size() == 4) {
                         vo.setIsMoreComment(1);
