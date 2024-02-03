@@ -10,7 +10,7 @@ public interface FeedMapper {
     int insFeed(FeedInsProcDto dto);//피드 작성
     List<FeedSelVo> selFeedAll(FeedSelDto dto);//피드 리스트
     Integer selFeed(FeedDelDto dto);//피드 삭제 시 확인하는 select문
-    int delFeed(int ifeed);//피드 삭제
+    int delFeed(int ifeed);//피드 삭제//
     int insFeedPics(FeedInsProcDto dto);//피드 작성 시 실행되는 insert문(사진 추가)
     List<FeedPicsVo> selFeedPics(List<Integer> ifeedList);//피드 리스트 실행 시 해당 피드들의 사진들
     int delPicsByIfeed(int ifeed);//피드 삭제 시 해당 피드의 사진들 삭제
